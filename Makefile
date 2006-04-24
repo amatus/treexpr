@@ -16,7 +16,8 @@ DOTSO = .so
 
 # Source files
 SOURCES = regex/regcomp.c regex/regerror.c regex/regexec.c regex/regfree.c \
-	treexpr.c GrokHtml.c
+	treexpr.c
+JNISOURCES = $(SOURCES) GrokHtml.c
 
 # libxml2 flags
 XMLINCL = $(shell xml2-config --cflags)
@@ -30,11 +31,11 @@ JAVAINCL = -I/usr/include/sablevm
 # for freebsd using jdk15 from portage:
 # JAVAINCL = -I/usr/local/jdk1.5.0/include -I/usr/local/jdk1.5.0/include/freebsd
 
-INCL = -I./regex $(XMLINCL) $(JAVAINCL)
+INCL = -I./regex $(XMLINCL)
 LIBS = $(XMLLIBS)
 CFLAGS += -O2 -Wall
 
-all: $(LIB)GrokHtml$(DOTSO)
+all: $(LIB)GrokHtml$(DOTSO) $(LIB)treexpr$(DOTSO)
 
 GrokHtml.h: GrokHtml.class
 	$(JAVAH) -classpath . -jni -o $@ GrokHtml
@@ -45,7 +46,10 @@ GrokHtml.class: GrokHtml.java
 TestIt.class: TestIt.java
 	$(JAVAC) $<
 
-$(LIB)GrokHtml$(DOTSO): $(SOURCES) GrokHtml.h
+$(LIB)GrokHtml$(DOTSO): $(JNISOURCES) GrokHtml.h
+	$(CC) $(LIBS) $(CFLAGS) $(INCL) $(JAVAINCL) -shared -o $@ $(JNISOURCES)
+
+$(LIB)treexpr$(DOTSO): $(SOURCES)
 	$(CC) $(LIBS) $(CFLAGS) $(INCL) -shared -o $@ $(SOURCES)
 
 test: $(LIB)GrokHtml$(DOTSO) TestIt.class
@@ -53,5 +57,6 @@ test: $(LIB)GrokHtml$(DOTSO) TestIt.class
 
 clean:
 	$(RM) $(LIB)GrokHtml$(DOTSO) 
+	$(RM) $(LIB)treexpr$(DOTSO) 
 	$(RM) GrokHtml.h
 	$(RM) *.class

@@ -103,5 +103,6 @@ struct match
 const char *parse_treexpr( const char *expr, struct machine **m );
 void free_machine( struct machine *m );
 struct match *document_process( struct machine *m, xmlDocPtr doc );
+void free_matches( struct match *z );
 
 #endif

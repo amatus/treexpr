@@ -26,7 +26,8 @@
 #include "GrokHtml.h"
 
 #ifdef HTML_PARSE_RECOVER
-#define PARSER_OPTIONS	( HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING )
+#define PARSER_OPTIONS	( HTML_PARSE_RECOVER | HTML_PARSE_NOERROR \
+			| HTML_PARSE_NOWARNING )
 #else
 #define PARSER_OPTIONS	( HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING )
 #endif
@@ -46,7 +47,8 @@
  * Method:    FreeMachine
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_GrokHtml_FreeMachine( JNIEnv *env, jobject obj, jlong Machine )
+JNIEXPORT void JNICALL Java_GrokHtml_FreeMachine( JNIEnv *env, jobject obj,
+	jlong Machine )
 {
 	free_machine((struct machine *)JLONG_TO_POINTER( Machine ));
 }
@@ -56,7 +58,8 @@ JNIEXPORT void JNICALL Java_GrokHtml_FreeMachine( JNIEnv *env, jobject obj, jlon
  * Method:    ParseExpression
  * Signature: (Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_GrokHtml_ParseExpression( JNIEnv *env, jobject obj, jstring Expression )
+JNIEXPORT jlong JNICALL Java_GrokHtml_ParseExpression( JNIEnv *env, jobject obj,
+	jstring Expression )
 {
 	const char *expr, *residue;
 	struct machine *m;
@@ -79,19 +82,29 @@ JNIEXPORT jlong JNICALL Java_GrokHtml_ParseExpression( JNIEnv *env, jobject obj,
 		if( exc == NULL )
 			return 0;
 
-		/* Grab the method ID for the constructor: ParseException( String s, int errorOffset ) */
-		id = (*env)->GetMethodID( env, exc, "<init>", "(Ljava/lang/String;I)V" );
+		/*
+		 * Grab the method ID for the constructor: ParseException(
+		 * String s, int errorOffset )
+		 */
+		id = (*env)->GetMethodID( env, exc, "<init>",
+			"(Ljava/lang/String;I)V" );
 		if( id == 0 )
 			return 0;
 
-		/* Convert the error message from the parser to a java string object */
+		/*
+		 * Convert the error message from the parser to a java string
+		 * object
+		 */
 		message = (*env)->NewStringUTF( env, m->error );
 
 		/* Create the exception object */
-		/* NB: m->buf is a pointer into the origional string where the error occured, so we
-		   take the difference from expr to find errorOffset, this will not be accurate if
-		   the string contained any non-ASCII characters */
-		ex = (*env)->NewObject( env, exc, id, message, (jint)( m->buf - expr ));
+		/* NB: m->buf is a pointer into the origional string where the
+		 * error occured, so we take the difference from expr to find
+		 * errorOffset, this will not be accurate if the string
+		 * contained any non-ASCII characters
+		 */
+		ex = (*env)->NewObject( env, exc, id, message,
+			(jint)( m->buf - expr ));
 
 		/* Throw it */
 		(*env)->Throw( env, ex );
@@ -103,9 +116,10 @@ JNIEXPORT jlong JNICALL Java_GrokHtml_ParseExpression( JNIEnv *env, jobject obj,
 	}
 
 	/*
-	 * If residue is an empty string here then the entire thing was read as an expression.
-	 * It might be considered an error if there is some stuff left over, but it also might
-	 * be usefull to ignore it to be a little more robust. For now it's ignored.
+	 * If residue is an empty string here then the entire thing was read as
+	 * an expression. It might be considered an error if there is some stuff
+	 * left over, but it also might be usefull to ignore it to be a little
+	 * more robust. For now it's ignored.
 	 */
 
 	/* Clean up and return the pointer as a long */
@@ -118,7 +132,8 @@ JNIEXPORT jlong JNICALL Java_GrokHtml_ParseExpression( JNIEnv *env, jobject obj,
  * Method:    FreeDocument
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_GrokHtml_FreeDocument( JNIEnv *env, jobject obj, jlong Document )
+JNIEXPORT void JNICALL Java_GrokHtml_FreeDocument( JNIEnv *env, jobject obj,
+	jlong Document )
 {
 	xmlFreeDoc((htmlDocPtr)JLONG_TO_POINTER( Document ));
 }
@@ -128,7 +143,8 @@ JNIEXPORT void JNICALL Java_GrokHtml_FreeDocument( JNIEnv *env, jobject obj, jlo
  * Method:    OpenDocumentFromURI
  * Signature: (Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromURI( JNIEnv *env, jobject obj, jstring URI )
+JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromURI( JNIEnv *env,
+	jobject obj, jstring URI )
 {
 	const char *uri;
 	htmlDocPtr doc;
@@ -156,8 +172,8 @@ JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromURI( JNIEnv *env, jobject 
  * Method:    OpenDocumentFromBytes
  * Signature: ([B)J
  */
-JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromBytes( JNIEnv *env, jobject obj,
-	jbyteArray Bytes )
+JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromBytes( JNIEnv *env,
+	jobject obj, jbyteArray Bytes )
 {
 	jsize len;
 	jbyte *bytes;
@@ -188,13 +204,14 @@ JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromBytes( JNIEnv *env, jobjec
  * Method:    OpenDocumentFromString
  * Signature: (Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromString( JNIEnv *env, jobject obj,
-	jstring Document )
+JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromString( JNIEnv *env,
+	jobject obj, jstring Document )
 {
 	const char *document;
 	htmlDocPtr doc;
 
-	document = (char *)(*env)->GetStringUTFChars( env, Document, JNI_FALSE );
+	document = (char *)(*env)->GetStringUTFChars( env, Document,
+		JNI_FALSE );
 	doc = htmlReadMemory( document, strlen( document ), NULL,
 		NULL, PARSER_OPTIONS );
 	(*env)->ReleaseStringUTFChars( env, Document, document );
@@ -218,8 +235,8 @@ JNIEXPORT jlong JNICALL Java_GrokHtml_OpenDocumentFromString( JNIEnv *env, jobje
  * Method:    SearchDocument
  * Signature: (JLjava/lang/String;J)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj, jlong Document,
-	jstring Pattern, jlong Machine )
+JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env,
+	jobject obj, jlong Document, jstring Pattern, jlong Machine )
 {
 	const char *pattern;
 	struct match *z;
@@ -243,6 +260,7 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 		(*env)->ThrowNew( env, exc, "No match found" );
 
 		/* Clean up and return */
+		free_matches( z );
 		return NULL;
 	}
 
@@ -250,10 +268,14 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 	pattern = (char *)(*env)->GetStringUTFChars( env, Pattern, JNI_FALSE );
 	sub = 0;
 	for( i = 0; pattern[i] != 0; i++ )
-		if( pattern[i] == '\\' && isdigit( pattern[i + 1] ) && sub < pattern[i + 1] - '0' )
+		if( pattern[i] == '\\' && isdigit( pattern[i + 1] )
+			&& sub < pattern[i + 1] - '0' )
 			sub = pattern[i + 1] - '0';
 
-	/* Allocate an array for matches, only enough to hold what we're going to use */
+	/*
+	 * Allocate an array for matches, only enough to hold what we're going
+	 * to use
+	 */
 	re = malloc( sub * sizeof( struct regex_match * ));
 	if( re == NULL )
 	{
@@ -268,6 +290,7 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 
 		/* Clean up and return */
 		(*env)->ReleaseStringUTFChars( env, Pattern, pattern );
+		free_matches( z );
 		return NULL;
 	}
 
@@ -279,15 +302,18 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 		jclass exc;
 
 		/* Throw an index out of bounds exception */
-		exc = (*env)->FindClass( env, "java/lang/IndexOutOfBoundsException" );
+		exc = (*env)->FindClass( env,
+			"java/lang/IndexOutOfBoundsException" );
 		if( exc == NULL )
 			return NULL;
 
-		(*env)->ThrowNew( env, exc, "Not enough matches to satisfy pattern" );
+		(*env)->ThrowNew( env, exc,
+			"Not enough matches to satisfy pattern" );
 
 		/* Clean up and return */
 		free( re );
 		(*env)->ReleaseStringUTFChars( env, Pattern, pattern );
+		free_matches( z );
 		return NULL;
 	}
 
@@ -297,7 +323,8 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 		if( pattern[i] == '\\' && isdigit( pattern[i + 1] ))
 		{
 			sub = pattern[++i] - '1';
-			for( k = re[sub]->match.rm_so; k < re[sub]->match.rm_eo; k++ )
+			for( k = re[sub]->match.rm_so; k < re[sub]->match.rm_eo;
+				k++ )
 				len++;
 		}
 		else
@@ -319,6 +346,7 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 		/* Clean up and return */
 		free( re );
 		(*env)->ReleaseStringUTFChars( env, Pattern, pattern );
+		free_matches( z );
 		return NULL;
 	}
 
@@ -327,7 +355,8 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 		if( pattern[i] == '\\' && isdigit( pattern[i + 1] ))
 		{
 			sub = pattern[++i] - '1';
-			for( k = re[sub]->match.rm_so; k < re[sub]->match.rm_eo; k++ )
+			for( k = re[sub]->match.rm_so; k < re[sub]->match.rm_eo;
+				k++ )
 				buf[j++] = re[sub]->str[k];
 		}
 		else
@@ -337,6 +366,7 @@ JNIEXPORT jstring JNICALL Java_GrokHtml_SearchDocument( JNIEnv *env, jobject obj
 	/* Clean up and return the string */
 	free( re );
 	(*env)->ReleaseStringUTFChars( env, Pattern, pattern );
+	free_matches( z );
 	retval = (*env)->NewStringUTF( env, buf );
 	free( buf );
 	return retval;

@@ -1143,3 +1143,21 @@ struct match *document_process( struct machine *m, xmlDocPtr doc )
 {
 	return node_recurse( m, doc->children->next, NULL );
 }
+
+// free matches returned by document_process
+void free_matches( struct match *z )
+{
+	struct match *nextz;
+	struct regex_match *nextre;
+
+	for( ; z != NULL; z = nextz )
+	{
+		nextz = z->next;
+		for( ; z->re != NULL; z->re = nextre )
+		{
+			nextre = z->re->next;
+			free( z->re );
+		}
+		free( z );
+	}
+}
