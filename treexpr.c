@@ -990,6 +990,7 @@ int tree_process( struct machine *m, xmlNodePtr node )
 		m->next_state = zalloc( N( m->next_state, m->states ) * sizeof( *m->next_state ));
 
 	// our inital current state is E(start)
+	memset( m->cur_state, 0, N( m->cur_state, m->states ) * sizeof( *m->cur_state ));
 	OR( m->cur_state, m->E[m->start->num], m->states );
 
 	// main loop, terminate when we run out of input or when there's no states in the cur_state bitmask

@@ -52,6 +52,9 @@ $(LIB)GrokHtml$(DOTSO): $(JNISOURCES) GrokHtml.h
 $(LIB)treexpr$(DOTSO): $(SOURCES)
 	$(CC) $(LIBS) $(CFLAGS) $(INCL) -shared -o $@ $(SOURCES)
 
+run: run.c $(LIB)treexpr$(DOTSO) treexpr.h
+	$(CC) $(LIBS) $(CFLAGS) $(INCL) $(LIB)treexpr$(DOTSO) -o $@ run.c
+
 test: $(LIB)GrokHtml$(DOTSO) TestIt.class
 	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):. $(JAVA) TestIt
 
